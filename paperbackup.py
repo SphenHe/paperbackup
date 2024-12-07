@@ -32,7 +32,7 @@ import re
 import sys
 import hashlib
 import subprocess
-import qrencode
+import qrcode
 from tempfile import mkstemp
 from datetime import datetime
 from PIL import Image
@@ -57,10 +57,16 @@ paperformat_str = "A4"
 
 
 def create_barcode(chunkdata):
-    version, size, im = qrencode.encode(chunkdata,
-                                        level=qrencode.QR_ECLEVEL_H,
-                                        case_sensitive=True)
-    return im
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_Q,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(chunkdata)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white")
+    return img
 
 
 def finish_page(pdf, canv, pageno):
